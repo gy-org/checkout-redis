@@ -1,0 +1,14 @@
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: checkout-redis
+  annotations:
+    github.com/project-slug: gy-org/checkout-redis
+    backstage.io/kubernetes-label-selector: 'app=checkout-redis'
+  description: checkout-redis created
+spec:
+  type: service
+  owner: user:guest
+  lifecycle: experimental
+  # dependsOn:
+  #   - resource:crossplane-eks-demo-05
