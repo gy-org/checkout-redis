@@ -1,19 +1,81 @@
+---
+# Source: checkout/templates/serviceaccount.yaml
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: checkout
+  labels:
+    helm.sh/chart: checkout-0.0.1
+    app.kubernetes.io/name: checkout
+    app.kubernetes.io/instance: checkout
+    app.kubernetes.io/component: service
+    app.kuberneres.io/owner: retail-store-sample
+    app.kubernetes.io/managed-by: Helm
+---
+# Source: checkout/templates/configmap.yml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: checkout
+data:
+  REDIS_URL: redis://checkout-redis:6379
+  ENDPOINTS_ORDERS: http://orders:80
+---
+# Source: checkout/templates/redis-service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: ${APP_NAME}
+  labels:
+    helm.sh/chart: checkout-0.0.1
+    app.kubernetes.io/name: checkout
+    app.kubernetes.io/instance: checkout
+    app.kubernetes.io/component: redis
+    app.kubernetes.io/managed-by: Helm
+spec:
+  type: ClusterIP
+  ports:
+    - port: 6379
+      targetPort: redis
+      protocol: TCP
+      name: redis
+  selector:
+    app.kubernetes.io/name: checkout
+    app.kubernetes.io/instance: checkout
+    app.kubernetes.io/component: redis
+---
+# Source: checkout/templates/redis-deployment.yaml
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: ${APP_NAME}
+  labels:
+    helm.sh/chart: checkout-0.0.1
+    app.kubernetes.io/name: checkout
+    app.kubernetes.io/instance: checkout
+    app.kubernetes.io/component: redis
+    app.kubernetes.io/managed-by: Helm
 spec:
   replicas: 1
   selector:
     matchLabels:
       app: ${APP_NAME}
+      app.kubernetes.io/name: checkout
+      app.kubernetes.io/instance: checkout
+      app.kubernetes.io/component: redis
   template:
     metadata:
       labels:
         app: ${APP_NAME}
+        app.kubernetes.io/name: checkout
+        app.kubernetes.io/instance: checkout
+        app.kubernetes.io/component: redis
     spec:
       containers:
-      - name: app
-        image: "${IMAGE}"
-        ports:
-        - containerPort: 80
+        - name: redis
+          image: "redis:6.0-alpine"
+          imagePullPolicy: IfNotPresent
+          ports:
+            - name: redis
+              containerPort: 6379
+              protocol: TCP
