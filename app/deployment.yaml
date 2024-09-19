@@ -50,6 +50,7 @@ kind: Deployment
 metadata:
   name: ${APP_NAME}
   labels:
+    app: ${APP_NAME}
     helm.sh/chart: checkout-0.0.1
     app.kubernetes.io/name: checkout
     app.kubernetes.io/instance: checkout
